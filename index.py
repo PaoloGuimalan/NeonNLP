@@ -6,14 +6,15 @@ import pprint
 rawphrase = sys.argv[1]
 wrd = sys.argv[1]
 typesDefault = {
-    "NOUN": "n.",
-    "PRONOUN": "p.",
-    "VERB": "v.",
-    "ADJECTIVE": "adj.",
-    "ADVERB": "adv.",
-    "PREPOSITION": "prep.",
-    "CONJUNCTION": "conj.",
-    "INTERJECTION": "i."
+    "n.": "NOUN",
+    "p.": "PRONOUN",
+    "pron.": "PRONOUN",
+    "v.": "VERB",
+    "adj.": "ADJECTIVE",
+    "adv.": "ADVERB",
+    "prep.": "PREPOSITION",
+    "conj.": "CONJUNCTION",
+    "i.": "INTERJECTION"
 }
 
 def fetchWordFiltered(wrdprop):
@@ -28,13 +29,19 @@ def fetchWordFiltered(wrdprop):
         formattedWordHolder = element["word"]
         
         if element["type"] != "()":
-            if element["type"] not in formattedWordObject:
-                formattedWordObject.append(element["type"])
-    
-    # return [{
-    #     "word": element["word"],
-    #     "type": element["type"]
-    # } for element in filteredArray]
+            splitstring = element["type"].replace("(", "").replace(")", "").replace("&", "")
+            splitstringarray = splitstring.split()
+            
+            for splits in splitstringarray:
+                for key in typesDefault:
+                    if splits == key:
+                        if typesDefault[splits] not in formattedWordObject:
+                            formattedWordObject.append(typesDefault[splits])
+                    else:
+                        refurbishedsplit = f"({splits})"
+                        if splits not in typesDefault.keys():
+                            if refurbishedsplit not in formattedWordObject:
+                                formattedWordObject.append(refurbishedsplit)
     
     return {
         "word": formattedWordHolder,
@@ -56,18 +63,14 @@ def tokenizeSentences(sentence):
 
 def tokenization(data):
     finalArray = []
-    cleanArray = []
+    # cleanArray = []
     
     tokenizedToSentences = re.split('\\.|\\?|\\!', data)
     tokenizedToSentencesClean = list(filter(None, tokenizedToSentences))
     for stncs in tokenizedToSentencesClean:
         tokenSntcsHolder = tokenizeSentences(stncs)
         finalArray.append(tokenSntcsHolder)
-        
-    for fnlarr in finalArray:
-        print(fnlarr)
-        # cleanArray.append()
-        
+      
     print(finalArray)
     
 tokenization(rawphrase)
